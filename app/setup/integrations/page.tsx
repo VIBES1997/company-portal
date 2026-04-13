@@ -1,8 +1,23 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { integrations } from "@/lib/data";
+import { supabase } from "@/lib/supabase";
+
+interface Integration {
+  id: string; name: string; application_id?: string; state: string; created_on?: string; description?: string;
+}
 
 export default function IntegrationsList() {
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.from("integrations").select("*").order("name").then(({ data }) => {
+      setIntegrations(data || []);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <div className="m-2">
       <div className="bg-white border border-gray-300 rounded-sm">
@@ -36,13 +51,15 @@ export default function IntegrationsList() {
               </tr>
             </thead>
             <tbody>
-              {integrations.map(i => (
+              {loading ? (
+                <tr><td colSpan={5} className="text-center text-gray-400 py-4">Loading...</td></tr>
+              ) : integrations.map(i => (
                 <tr key={i.id}>
                   <td><input type="checkbox" /></td>
                   <td><Link href={`/setup/integrations/${i.id}`} className="link">{i.name}</Link></td>
-                  <td className="text-gray-600 font-mono text-xs">{i.applicationId || ""}</td>
+                  <td className="text-gray-600 font-mono text-xs">{i.application_id || ""}</td>
                   <td><span className="status-badge status-enabled">{i.state}</span></td>
-                  <td className="text-gray-600">{i.createdOn || ""}</td>
+                  <td className="text-gray-600">{i.created_on || ""}</td>
                 </tr>
               ))}
             </tbody>

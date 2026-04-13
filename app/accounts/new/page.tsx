@@ -2,9 +2,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function NewAccount() {
   const router = useRouter();
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     number: "", name: "", subaccountOf: "", type: "Bank", currency: "",
     generalRateType: "Current", cashFlowRateType: "Average", inventory: false,
@@ -18,6 +20,30 @@ export default function NewAccount() {
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }));
 
   const subsidiaryOptions = ["Parent Company", "Germany", "India", "United Kingdom", "US East", "US West"];
+
+  const handleSave = async () => {
+    if (!form.name) { alert("Name is required"); return; }
+    setSaving(true);
+    const { error } = await supabase.from("accounts").insert({
+      number: form.number || null,
+      name: form.name,
+      type: form.type,
+      currency: form.currency || null,
+      description: form.description || null,
+      inactive: form.inactive,
+      summary: form.summary,
+      inventory: form.inventory,
+      general_rate_type: form.generalRateType,
+      cash_flow_rate_type: form.cashFlowRateType,
+      bank_name: form.bankName || null,
+      bank_routing_number: form.bankRoutingNumber || null,
+      bank_account_number: form.bankAccountNumber || null,
+      subsidiaries: form.subsidiaries,
+    });
+    setSaving(false);
+    if (error) { alert("Error: " + error.message); return; }
+    router.back();
+  };
 
   return (
     <div className="m-2">
@@ -36,7 +62,7 @@ export default function NewAccount() {
         </div>
 
         <div className="toolbar">
-          <button className="btn-primary" onClick={() => router.back()}>Save</button>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Save"}</button>
           <button className="btn-secondary" onClick={() => router.back()}>Cancel</button>
         </div>
 
@@ -212,7 +238,7 @@ export default function NewAccount() {
         </div>
 
         <div className="toolbar border-t border-gray-200">
-          <button className="btn-primary" onClick={() => router.back()}>Save</button>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Save"}</button>
           <button className="btn-secondary" onClick={() => router.back()}>Cancel</button>
         </div>
       </div>

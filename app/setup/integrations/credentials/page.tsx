@@ -1,10 +1,49 @@
 "use client";
-import { useState } from "react";
-import { credentials } from "@/lib/data";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+
+interface Credential {
+  id: string; certificate_id: string; algorithm: string; application: string;
+  entity: string; role: string; created_date: string; valid_from: string;
+  valid_until: string; revoked: boolean;
+}
 
 export default function M2MCredentials() {
+  const [credentials, setCredentials] = useState<Credential[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [newCred, setNewCred] = useState({ entity: "", role: "", application: "", certificate: null as File | null });
+
+  useEffect(() => {
+    supabase.from("credentials").select("*").order("created_date", { ascending: false }).then(({ data }) => {
+      setCredentials(data || []);
+      setLoading(false);
+    });
+  }, []);
+
+  const handleSave = async () => {
+    if (!newCred.entity || !newCred.role || !newCred.application) { alert("Entity, role and application are required"); return; }
+    setSaving(true);
+    const today = new Date().toISOString().split("T")[0];
+    const validUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    const { data, error } = await supabase.from("credentials").insert({
+      certificate_id: "cert_" + Math.random().toString(36).slice(2, 10),
+      algorithm: "RS256",
+      application: newCred.application,
+      entity: newCred.entity,
+      role: newCred.role,
+      created_date: today,
+      valid_from: today,
+      valid_until: validUntil,
+      revoked: false,
+    }).select().single();
+    setSaving(false);
+    if (error) { alert("Error: " + error.message); return; }
+    if (data) setCredentials(prev => [data, ...prev]);
+    setShowModal(false);
+    setNewCred({ entity: "", role: "", application: "", certificate: null });
+  };
 
   return (
     <div className="m-2">
@@ -33,20 +72,25 @@ export default function M2MCredentials() {
               </tr>
             </thead>
             <tbody>
-              {credentials.map(c => (
+              {loading ? (
+                <tr><td colSpan={9} className="text-center text-gray-400 py-4">Loading...</td></tr>
+              ) : credentials.map(c => (
                 <tr key={c.id}>
-                  <td className="font-mono text-xs text-gray-700">{c.certificateId}</td>
+                  <td className="font-mono text-xs text-gray-700">{c.certificate_id}</td>
                   <td className="text-gray-700">{c.algorithm}</td>
                   <td><span className="link">{c.application}</span></td>
                   <td><span className="link">{c.entity}</span></td>
                   <td><span className="link">{c.role}</span></td>
-                  <td className="text-gray-600">{c.createdDate}</td>
-                  <td className="text-gray-600">{c.validFrom}</td>
-                  <td className="text-gray-600">{c.validUntil}</td>
+                  <td className="text-gray-600">{c.created_date}</td>
+                  <td className="text-gray-600">{c.valid_from}</td>
+                  <td className="text-gray-600">{c.valid_until}</td>
                   <td>
                     {c.revoked
-                      ? <button className="btn-secondary text-xs" style={{ color: "#cc0000" }}>Revoke</button>
-                      : <input type="checkbox" checked readOnly />
+                      ? <input type="checkbox" checked readOnly />
+                      : <button className="btn-secondary text-xs" style={{ color: "#cc0000" }} onClick={async () => {
+                          await supabase.from("credentials").update({ revoked: true }).eq("id", c.id);
+                          setCredentials(prev => prev.map(x => x.id === c.id ? { ...x, revoked: true } : x));
+                        }}>Revoke</button>
                     }
                   </td>
                 </tr>
@@ -103,7 +147,8 @@ export default function M2MCredentials() {
                 </div>
               </div>
               <div className="pt-2">
-                <button className="btn-secondary text-xs" onClick={() => setShowModal(false)}>Save</button>
+                <button className="btn-primary text-xs" onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Save"}</button>
+                <button className="btn-secondary text-xs ml-2" onClick={() => setShowModal(false)}>Cancel</button>
               </div>
             </div>
           </div>

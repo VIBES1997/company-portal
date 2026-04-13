@@ -1,14 +1,27 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { integrations } from "@/lib/data";
+import { supabase } from "@/lib/supabase";
+
+interface Integration {
+  id: string; name: string; application_id?: string; state: string; created_on?: string;
+  description?: string; created_by?: string; script_id?: string;
+}
 
 export default function IntegrationDetail() {
   const params = useParams();
   const router = useRouter();
-  const integ = integrations.find(i => i.id === params.id) || integrations[5];
+  const [integ, setInteg] = useState<Integration | null>(null);
   const [activeTab, setActiveTab] = useState("Authentication");
+
+  useEffect(() => {
+    supabase.from("integrations").select("*").eq("id", params.id).single().then(({ data }) => {
+      setInteg(data);
+    });
+  }, [params.id]);
+
+  if (!integ) return <div className="m-4 text-gray-400">Loading...</div>;
 
   const tabs = ["Authentication", "Execution Log", "System Notes"];
 
@@ -32,7 +45,7 @@ export default function IntegrationDetail() {
         <div className="grid grid-cols-3 gap-4 p-4 border-b border-gray-200">
           <div>
             <div className="detail-label">APPLICATION ID</div>
-            <div className="detail-value font-mono text-xs">{integ.applicationId || "—"}</div>
+            <div className="detail-value font-mono text-xs">{integ.application_id || "—"}</div>
           </div>
           <div>
             <div className="detail-label">STATE</div>
@@ -40,7 +53,7 @@ export default function IntegrationDetail() {
           </div>
           <div>
             <div className="detail-label">CREATED</div>
-            <div className="detail-value">{integ.createdOn || "—"}</div>
+            <div className="detail-value">{integ.created_on || "—"}</div>
           </div>
           <div>
             <div className="detail-label">NAME</div>
@@ -52,7 +65,7 @@ export default function IntegrationDetail() {
           </div>
           <div>
             <div className="detail-label">CREATED BY</div>
-            <div className="detail-value">Company</div>
+            <div className="detail-value">{integ.created_by || "Company"}</div>
           </div>
           <div>
             <div className="detail-label">DESCRIPTION</div>
