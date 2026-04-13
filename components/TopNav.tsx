@@ -17,11 +17,11 @@ const NAV_ITEMS = [
 ];
 
 const COMPANIES = [
-  "Fake Co. Inc.",
-  "Totally Real Ltd.",
-  "Not A Company LLC",
-  "Placeholder Corp",
-  "Test Industries",
+  "Hartwell & Associates",
+  "Pinnacle Global Ltd.",
+  "Crestwood Capital Group",
+  "Northgate Solutions Inc.",
+  "Sterling Bridge Holdings",
 ];
 
 export default function TopNav() {
@@ -39,10 +39,10 @@ export default function TopNav() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <div className="w-7 h-7 rounded flex items-center justify-center" style={{ background: "#e8a020" }}>
-            <span className="text-white font-bold text-xs">J</span>
+            <span className="text-white font-bold text-xs">A</span>
           </div>
           <div className="leading-tight">
-            <span className="text-white font-bold text-sm tracking-wide">JetSuite</span>
+            <span className="text-white font-bold text-sm tracking-wide">AceSuite</span>
           </div>
         </Link>
 

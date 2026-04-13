@@ -3,8 +3,8 @@ import "./globals.css";
 import TopNav from "@/components/TopNav";
 
 export const metadata: Metadata = {
-  title: "JetSuite",
-  description: "JetSuite — Finance & Operations Portal",
+  title: "AceSuite",
+  description: "AceSuite — Finance & Operations Portal",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
