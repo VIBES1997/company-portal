@@ -16,9 +16,19 @@ const NAV_ITEMS = [
   { label: "Administration", href: "/admin" },
 ];
 
+const COMPANIES = [
+  "Fake Co. Inc.",
+  "Totally Real Ltd.",
+  "Not A Company LLC",
+  "Placeholder Corp",
+  "Test Industries",
+];
+
 export default function TopNav() {
   const pathname = usePathname();
   const [searchVal, setSearchVal] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState(COMPANIES[0]);
+  const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
 
   const isActive = (href: string) => pathname.startsWith(href);
 
@@ -29,10 +39,10 @@ export default function TopNav() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <div className="w-7 h-7 rounded flex items-center justify-center" style={{ background: "#e8a020" }}>
-            <span className="text-white font-bold text-xs">V</span>
+            <span className="text-white font-bold text-xs">J</span>
           </div>
           <div className="leading-tight">
-            <span className="text-white font-bold text-sm tracking-wide">Vertex</span>
+            <span className="text-white font-bold text-sm tracking-wide">JetSuite</span>
           </div>
         </Link>
 
@@ -62,12 +72,42 @@ export default function TopNav() {
           </button>
           <button className="hover:text-white">Help</button>
           <button className="hover:text-white">Feedback</button>
-          <div className="flex items-center gap-1.5 text-white">
-            <div className="w-6 h-6 rounded-full bg-blue-400 flex items-center justify-center text-xs font-bold">A</div>
-            <div className="text-right leading-tight">
-              <div className="font-semibold text-xs">Ashford Holdings</div>
-              <div className="text-blue-300" style={{ fontSize: "10px" }}>Administrator</div>
-            </div>
+
+          {/* Company switcher */}
+          <div className="relative">
+            <button
+              className="flex items-center gap-1.5 text-white hover:bg-blue-800 rounded px-2 py-1 transition-colors"
+              onClick={() => setShowCompanyDropdown(v => !v)}
+            >
+              <div className="w-6 h-6 rounded-full bg-blue-400 flex items-center justify-center text-xs font-bold shrink-0">
+                {selectedCompany[0]}
+              </div>
+              <div className="text-right leading-tight">
+                <div className="font-semibold text-xs">{selectedCompany}</div>
+                <div className="text-blue-300 text-left" style={{ fontSize: "10px" }}>Administrator ▾</div>
+              </div>
+            </button>
+
+            {showCompanyDropdown && (
+              <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded shadow-lg z-50 min-w-48">
+                <div className="px-3 py-2 text-xs font-bold text-gray-400 uppercase border-b border-gray-100">
+                  Switch Company
+                </div>
+                {COMPANIES.map(c => (
+                  <button
+                    key={c}
+                    className={`w-full text-left px-3 py-2 text-xs hover:bg-blue-50 flex items-center gap-2 ${c === selectedCompany ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-700"}`}
+                    onClick={() => { setSelectedCompany(c); setShowCompanyDropdown(false); }}
+                  >
+                    <div className="w-5 h-5 rounded-full bg-blue-200 flex items-center justify-center text-xs font-bold text-blue-700 shrink-0">
+                      {c[0]}
+                    </div>
+                    {c}
+                    {c === selectedCompany && <span className="ml-auto text-blue-500">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
