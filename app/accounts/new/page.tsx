@@ -10,7 +10,7 @@ export default function NewAccount() {
   const [form, setForm] = useState({
     number: "", name: "", subaccountOf: "", type: "Bank", currency: "",
     generalRateType: "Current", cashFlowRateType: "Average", inventory: false,
-    description: "", date: "4/8/2026", summary: false, inactive: false,
+    description: "", date: new Date().toISOString().split("T")[0], summary: false, inactive: false,
     bankName: "", bankRoutingNumber: "", bankAccountNumber: "",
     restrictToDepartment: "", restrictToClass: "", restrictToLocation: "",
     subsidiaries: ["Parent Company"] as string[],
@@ -31,8 +31,6 @@ export default function NewAccount() {
       currency: form.currency || null,
       description: form.description || null,
       inactive: form.inactive,
-      summary: form.summary,
-      inventory: form.inventory,
       general_rate_type: form.generalRateType,
       cash_flow_rate_type: form.cashFlowRateType,
       bank_name: form.bankName || null,

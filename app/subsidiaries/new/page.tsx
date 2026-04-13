@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 export default function NewSubsidiary() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [parentOptions, setParentOptions] = useState<string[]>([]);
   const [form, setForm] = useState({
     inactive: false, name: "", parentSubsidiary: "Parent Company",
     website: "", documentNumberPrefix: "", stateProvince: "",
@@ -16,6 +17,12 @@ export default function NewSubsidiary() {
     bankDetails: "", documentFooterMessage: "",
   });
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }));
+
+  useEffect(() => {
+    supabase.from("subsidiaries").select("name").order("name").then(({ data }) => {
+      setParentOptions((data || []).map((s: { name: string }) => s.name));
+    });
+  }, []);
 
   const handleSave = async () => {
     if (!form.name) { alert("Name is required"); return; }
@@ -61,8 +68,8 @@ export default function NewSubsidiary() {
             <div>
               <label className="form-label">PARENT SUBSIDIARY <span className="required-star">*</span></label>
               <select className="form-select" value={form.parentSubsidiary} onChange={e => set("parentSubsidiary", e.target.value)}>
-                <option>Parent Company</option><option>Germany</option><option>India</option>
-                <option>United Kingdom</option><option>US East</option><option>US West</option>
+                <option value=""></option>
+                {parentOptions.map(p => <option key={p}>{p}</option>)}
               </select>
             </div>
             <div><label className="form-label">WEB SITE</label><input className="form-input" value={form.website} onChange={e => set("website", e.target.value)} /></div>

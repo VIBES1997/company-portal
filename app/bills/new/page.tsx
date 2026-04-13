@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -9,6 +9,8 @@ export default function NewBill() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("Expenses and Items");
   const [lineItems, setLineItems] = useState([{ account: "", amount: "", memo: "" }]);
+  const [vendors, setVendors] = useState<{ id: string; name: string }[]>([]);
+  const [subsidiaries, setSubsidiaries] = useState<{ id: string; name: string }[]>([]);
   const [form, setForm] = useState({
     customForm: "Standard Vendor Bill", currency: "US Dollar", exchangeRate: "1.00",
     dueDate: "", date: new Date().toISOString().split("T")[0], postingPeriod: "",
@@ -17,6 +19,23 @@ export default function NewBill() {
   });
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
   const tabs = ["Expenses and Items", "Billing", "Relationships", "Communication", "Custom", "EET"];
+
+  // Generate posting periods: current month ± 6 months
+  const postingPeriods = (() => {
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const now = new Date();
+    const periods: string[] = [];
+    for (let i = -2; i <= 9; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      periods.push(`${months[d.getMonth()]} ${d.getFullYear()}`);
+    }
+    return periods;
+  })();
+
+  useEffect(() => {
+    supabase.from("vendors").select("id, name").order("name").then(({ data }) => setVendors(data || []));
+    supabase.from("subsidiaries").select("id, name").order("name").then(({ data }) => setSubsidiaries(data || []));
+  }, []);
 
   const handleSave = async () => {
     if (!form.vendor) { alert("Vendor is required"); return; }
@@ -82,15 +101,7 @@ export default function NewBill() {
                 <label className="form-label">VENDOR <span className="required-star">*</span></label>
                 <select className="form-select" value={form.vendor} onChange={e => set("vendor", e.target.value)}>
                   <option value="">— Select vendor —</option>
-                  <option>ACME Industries</option>
-                  <option>Adirondack Networking</option>
-                  <option>Berge Inc</option>
-                  <option>Brightway Solutions Pvt. Ltd.</option>
-                  <option>Brocade Communications Systems</option>
-                  <option>Cable Plus Distributors</option>
-                  <option>CDW</option>
-                  <option>Cloud Consulting</option>
-                  <option>CoreSolutions</option>
+                  {vendors.map(v => <option key={v.id} value={v.name}>{v.name}</option>)}
                 </select>
               </div>
               <div>
@@ -99,11 +110,16 @@ export default function NewBill() {
                   <option value="">— Select account —</option>
                   <option>2000 Accounts Payable</option>
                   <option>6610 Expenses</option>
+                  <option>6610 Expenses : G&A</option>
+                  <option>6610 Expenses : Facilities Related</option>
+                  <option>6610 Expenses : Rent Expense</option>
                 </select>
               </div>
               <div>
                 <label className="form-label">AMOUNT</label>
-                <input className="form-input" type="number" value={form.amount} onChange={e => set("amount", e.target.value)} placeholder="Auto-calculated from line items" />
+                <input className="form-input bg-gray-50" type="number" value={
+                  lineItems.reduce((s, li) => s + (parseFloat(li.amount) || 0), 0) || form.amount
+                } readOnly placeholder="Auto-calculated from line items" />
               </div>
             </div>
 
@@ -145,9 +161,7 @@ export default function NewBill() {
                 <label className="form-label">POSTING PERIOD</label>
                 <select className="form-select" value={form.postingPeriod} onChange={e => set("postingPeriod", e.target.value)}>
                   <option value=""></option>
-                  <option>Jan 2026</option><option>Feb 2026</option>
-                  <option>Mar 2026</option><option>Apr 2026</option>
-                  <option>May 2026</option><option>Jun 2026</option>
+                  {postingPeriods.map(p => <option key={p}>{p}</option>)}
                 </select>
               </div>
               <div>
@@ -163,8 +177,7 @@ export default function NewBill() {
               <label className="form-label">SUBSIDIARY <span className="required-star">*</span></label>
               <select className="form-select" value={form.subsidiary} onChange={e => set("subsidiary", e.target.value)}>
                 <option value=""></option>
-                <option>Parent Company</option><option>Germany</option><option>India</option>
-                <option>United Kingdom</option><option>US East</option><option>US West</option>
+                {subsidiaries.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
               </select>
             </div>
             <div>
