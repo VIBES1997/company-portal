@@ -29,10 +29,10 @@ export default function TopNav() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <div className="w-7 h-7 rounded flex items-center justify-center" style={{ background: "#e8a020" }}>
-            <span className="text-white font-bold text-xs">N</span>
+            <span className="text-white font-bold text-xs">V</span>
           </div>
           <div className="leading-tight">
-            <span className="text-white font-bold text-sm tracking-wide">NovaSuite</span>
+            <span className="text-white font-bold text-sm tracking-wide">Vertex</span>
           </div>
         </Link>
 
@@ -65,7 +65,7 @@ export default function TopNav() {
           <div className="flex items-center gap-1.5 text-white">
             <div className="w-6 h-6 rounded-full bg-blue-400 flex items-center justify-center text-xs font-bold">A</div>
             <div className="text-right leading-tight">
-              <div className="font-semibold text-xs">Meridian Group</div>
+              <div className="font-semibold text-xs">Ashford Holdings</div>
               <div className="text-blue-300" style={{ fontSize: "10px" }}>Administrator</div>
             </div>
           </div>
