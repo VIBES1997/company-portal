@@ -29,6 +29,13 @@ export default function BillDetail() {
 
   const lineItems = bill.line_items || [];
 
+  async function handleCancelBill() {
+    if (!confirm(`Cancel bill ${bill!.document_number || bill!.id}? This cannot be undone.`)) return;
+    const { error } = await supabase.from("bills").update({ status: "Cancelled" }).eq("id", bill!.id);
+    if (error) { alert("Failed to cancel bill: " + error.message); return; }
+    router.push("/bills");
+  }
+
   return (
     <div className="m-2 flex gap-2">
       {/* Left: invoice preview */}
@@ -84,7 +91,7 @@ export default function BillDetail() {
           <div><div className="detail-label">DATE</div><div className="detail-value">{bill.date}</div></div>
           <div><div className="detail-label">SUBSIDIARY</div><div className="detail-value">{bill.subsidiary || "—"}</div></div>
           <div><div className="detail-label">EXCHANGE RATE</div><div className="detail-value">{bill.exchange_rate || "1.00"}</div></div>
-          <div><div className="detail-label">APPROVAL STATUS</div><div className="detail-value"><span className={`status-badge ${bill.status === "Pending Approval" ? "status-pending" : bill.status === "Open" ? "status-open" : "status-paid"}`}>{bill.status}</span></div></div>
+          <div><div className="detail-label">APPROVAL STATUS</div><div className="detail-value"><span className={`status-badge ${bill.status === "Pending Approval" ? "status-pending" : bill.status === "Open" ? "status-open" : bill.status === "Cancelled" ? "status-cancelled" : "status-paid"}`}>{bill.status}</span></div></div>
           <div><div className="detail-label">POSTING PERIOD</div><div className="detail-value">{bill.posting_period || "—"}</div></div>
           <div><div className="detail-label">REFERENCE NO.</div><div className="detail-value">{bill.reference_no || "—"}</div></div>
           <div><div className="detail-label">ACCOUNT</div><div className="detail-link">{bill.account}</div></div>
@@ -129,7 +136,7 @@ export default function BillDetail() {
         <div className="toolbar border-t border-gray-200 mt-4">
           <Link href={`/bills/${bill.id}/edit`} className="btn-primary text-xs">Edit</Link>
           <button className="btn-secondary text-xs" onClick={() => router.back()}>Back</button>
-          <button className="btn-secondary text-xs">Cancel Bill</button>
+          <button className="btn-secondary text-xs" onClick={handleCancelBill}>Cancel Bill</button>
           <button className="btn-secondary text-xs">Download File</button>
           <button className="btn-secondary text-xs">Actions ▾</button>
         </div>

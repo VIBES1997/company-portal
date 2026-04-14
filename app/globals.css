@@ -166,6 +166,7 @@ body {
 .status-open { background: #d1ecf1; color: #0c5460; }
 .status-paid { background: #d4edda; color: #155724; }
 .status-enabled { background: #d4edda; color: #155724; }
+.status-cancelled { background: #f8d7da; color: #721c24; }
 
 .required-star { color: #cc0000; margin-left: 2px; }
 

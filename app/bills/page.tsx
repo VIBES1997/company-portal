@@ -30,6 +30,7 @@ export default function BillList() {
     if (s === "Pending Approval") return "status-pending";
     if (s === "Open") return "status-open";
     if (s === "Paid In Full") return "status-paid";
+    if (s === "Cancelled") return "status-cancelled";
     return "";
   };
 
