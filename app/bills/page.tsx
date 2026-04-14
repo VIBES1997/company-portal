@@ -15,7 +15,7 @@ export default function BillList() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.from("bills").select("*").order("date", { ascending: false }).then(({ data }) => {
+    supabase.from("bills").select("*").order("created_at", { ascending: false }).then(({ data }) => {
       setBills(data || []);
       setLoading(false);
     });
