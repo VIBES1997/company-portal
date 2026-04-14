@@ -17,11 +17,11 @@ const NAV_ITEMS = [
 ];
 
 const COMPANIES = [
-  "Hartwell & Associates",
-  "Pinnacle Global Ltd.",
-  "Crestwood Capital Group",
-  "Northgate Solutions Inc.",
-  "Sterling Bridge Holdings",
+  "Kalvex & Partners",
+  "Zorrath Global Ltd.",
+  "Velmoor Capital Group",
+  "Trentix Solutions Inc.",
+  "Aurium Bridge Holdings",
 ];
 
 export default function TopNav() {
