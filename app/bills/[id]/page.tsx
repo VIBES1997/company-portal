@@ -29,6 +29,13 @@ export default function BillDetail() {
 
   const lineItems = bill.line_items || [];
 
+  const currencySymbol = (currency: string) => {
+    if (currency === "British pound") return "£";
+    if (currency === "Euro") return "€";
+    if (currency === "Indian Rupee") return "₹";
+    return "$";
+  };
+
   async function handleCancelBill() {
     if (!confirm(`Cancel bill ${bill!.document_number || bill!.id}? This cannot be undone.`)) return;
     const { error } = await supabase.from("bills").update({ status: "Cancelled" }).eq("id", bill!.id);
@@ -67,7 +74,7 @@ export default function BillDetail() {
               {lineItems.map((li, i) => (
                 <tr key={i} className="border-b border-gray-100">
                   <td className="p-2 text-xs">{li.description || li.account || li.memo || `Item ${i+1}`}</td>
-                  <td className="p-2 text-right text-xs">${Number(li.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                  <td className="p-2 text-right text-xs">{currencySymbol(bill.currency)}{Number(li.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
                 </tr>
               ))}
             </tbody>
@@ -75,7 +82,7 @@ export default function BillDetail() {
         )}
 
         <div className="mt-2 pt-2 border-t font-bold text-sm">
-          TOTAL DUE: ${Number(bill.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+          TOTAL DUE: {currencySymbol(bill.currency)}{Number(bill.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </div>
         <div className="text-xs text-gray-500 mt-1">Payment Terms: Net 30 days</div>
       </div>
