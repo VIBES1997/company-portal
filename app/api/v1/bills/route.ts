@@ -51,12 +51,13 @@ export async function POST(request: NextRequest) {
   }
   delete body.id;
   delete body.created_at;
+  delete body.status;
   const supabase = createServerClient();
   const { data, error } = await supabase
     .from("bills")
     .insert({
       ...body,
-      status: body.status ?? "Pending Approval",
+      status: "Pending Approval",
       currency: body.currency ?? "US Dollar",
       amount: body.amount ?? 0,
       line_items: body.line_items ?? [],

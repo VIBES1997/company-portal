@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const type = searchParams.get("type");
   const supabase = createServerClient();
-  let query = supabase.from("accounts").select("*").order("number");
+  let query = supabase.from("accounts").select("*").eq("inactive", false).order("number");
   if (type) query = query.eq("type", type);
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

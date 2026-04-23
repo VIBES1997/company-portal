@@ -51,7 +51,12 @@ export async function PATCH(
     .eq("id", id)
     .select()
     .single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  if (!data) return NextResponse.json({ error: "Bill not found" }, { status: 404 });
+  if (error) {
+    const isNotFound = error.code === "PGRST116";
+    return NextResponse.json(
+      { error: isNotFound ? "Bill not found" : error.message },
+      { status: isNotFound ? 404 : 500 }
+    );
+  }
   return NextResponse.json({ data });
 }
