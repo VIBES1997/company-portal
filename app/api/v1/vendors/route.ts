@@ -23,10 +23,9 @@ export async function GET(request: NextRequest) {
   let query = supabase
     .from("vendors")
     .select("*", { count: "exact" })
-    .order("name")
-    .range(offset, offset + limit - 1);
+    .order("name");
   if (search) query = query.ilike("name", `%${search}%`);
-  const { data, error, count } = await query;
+  const { data, error, count } = await query.range(offset, offset + limit - 1);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ data, total: count, limit, offset });
 }
