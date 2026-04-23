@@ -33,11 +33,11 @@ export async function POST(
       { status: isNotFound ? 404 : 500 }
     );
   }
-  if (bill.status === "Cancelled") {
-    return NextResponse.json({ error: "Cannot post a cancelled bill" }, { status: 422 });
-  }
-  if (bill.status === "Paid In Full") {
-    return NextResponse.json({ error: "Bill is already posted" }, { status: 422 });
+  if (bill.status !== "Open") {
+    return NextResponse.json(
+      { error: `Cannot post bill with status "${bill.status}"` },
+      { status: 422 }
+    );
   }
   const { data, error } = await supabase
     .from("bills")
