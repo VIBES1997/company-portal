@@ -1,3 +1,4 @@
+import "server-only";
 import { NextRequest } from "next/server";
 import { createServerClient } from "./supabase-server";
 
@@ -12,6 +13,7 @@ export interface Credential {
 export class ApiAuthError extends Error {
   constructor(message: string, public readonly status: number) {
     super(message);
+    this.name = "ApiAuthError";
   }
 }
 
