@@ -24,11 +24,10 @@ export async function GET(request: NextRequest) {
   let query = supabase
     .from("bills")
     .select("*", { count: "exact" })
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
+    .order("created_at", { ascending: false });
   if (status) query = query.eq("status", status);
   if (vendor) query = query.ilike("vendor_name", `%${vendor}%`);
-  const { data, error, count } = await query;
+  const { data, error, count } = await query.range(offset, offset + limit - 1);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ data, total: count, limit, offset });
 }
