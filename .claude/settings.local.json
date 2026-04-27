@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout *)",
+      "Bash(/Users/aksharahegde/Documents/work/df-projects/company-portal/node_modules/.bin/tsc *)",
+      "Bash(git fetch *)",
+      "Bash(npm test *)",
+      "Bash(node *)"
+    ]
+  }
+}

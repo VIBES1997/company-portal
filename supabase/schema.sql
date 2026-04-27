@@ -40,6 +40,7 @@ create table if not exists bills (
   subsidiary text,
   exchange_rate numeric(10,4) default 1,
   line_items jsonb default '[]',
+  erp_reference text,
   created_at timestamptz default now()
 );
 
